@@ -153,7 +153,7 @@ ff() { find . -type f -name "*$1*"; }
 fd() { find . -type d -name "*$1*"; }
 
 # Git 提交并推送
-gcp() { git add -A && git commit -m "$1" && git push; }
+gacp() { git add -A && git commit -m "$1" && git push; }
 
 # 查看端口占用
 port() { lsof -i :"$1"; }
