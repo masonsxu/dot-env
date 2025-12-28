@@ -7,7 +7,7 @@
 - **Zinit** - 快速插件管理器，Turbo 模式异步加载
 - **Powerlevel10k** - 美观高效的 Zsh 主题
 - **多语言支持** - Go / Node.js (NVM) / Python (uv)
-- **容器工具** - Podman/Docker 补全
+- **容器工具** - Podman 补全和别名
 - **敏感信息分离** - API tokens 等私密配置独立管理
 
 ## 快速开始
@@ -97,7 +97,12 @@ curl -LsSf https://astral.sh/uv/install.sh | sh
 | `ll` | `ls -alh` |
 | `v` | `nvim` |
 | `gotest` | `go test -v ./...` |
-| `pd` | `podman` |
+| `p` | `podman` |
+| `pc` | `podman-compose` |
+| `pps` | `podman ps` |
+| `pi` | `podman images` |
+| `pex` | `podman exec -it` |
+| `docker` | `podman`（兼容别名） |
 
 ### 实用函数
 | 函数 | 说明 |

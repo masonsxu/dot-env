@@ -43,13 +43,11 @@ zinit light agkozak/zsh-z
 zinit ice wait lucid
 zinit snippet OMZP::git
 
-# Docker 补全
-zinit ice wait lucid as"completion"
-zinit snippet OMZP::docker/_docker
-
-# kubectl 补全
-zinit ice wait lucid as"completion"
-zinit snippet OMZP::kubectl/kubectl.plugin.zsh
+# Podman 补全
+if command -v podman &> /dev/null; then
+  zinit ice wait lucid as"completion"
+  zinit snippet https://github.com/containers/podman/raw/main/completions/zsh/_podman
+fi
 
 # =============================================
 # 通用环境变量
@@ -63,7 +61,7 @@ export XDG_CONFIG_HOME="$HOME/.config"
 export XDG_CACHE_HOME="$HOME/.cache"
 export XDG_DATA_HOME="$HOME/.local/share"
 
-# Podman/Docker
+# Podman 运行时配置
 if [[ -z "$XDG_RUNTIME_DIR" ]]; then
   export XDG_RUNTIME_DIR=/run/user/$UID
   if [[ ! -d "$XDG_RUNTIME_DIR" ]]; then
@@ -128,11 +126,19 @@ alias gotest='go test -v ./...'
 alias gobuild='go build -v'
 alias gorun='go run'
 
-# Docker/Podman
-alias d='docker'
-alias dc='docker-compose'
-alias pd='podman'
-alias pdc='podman-compose'
+# Podman 容器
+alias p='podman'
+alias pc='podman-compose'
+alias pps='podman ps'
+alias ppsa='podman ps -a'
+alias pi='podman images'
+alias prm='podman rm'
+alias prmi='podman rmi'
+alias plog='podman logs'
+alias pex='podman exec -it'
+# 兼容 docker 命令习惯
+alias docker='podman'
+alias docker-compose='podman-compose'
 
 # =============================================
 # 实用函数
