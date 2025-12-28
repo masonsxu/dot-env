@@ -1,0 +1,18 @@
+# =============================================
+# 本地私有配置（不要提交到版本控制）
+# =============================================
+
+# Claude Code API 配置
+export ANTHROPIC_AUTH_TOKEN="your-token-here"
+export ANTHROPIC_BASE_URL="https://your-api-endpoint.com/"
+export CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC=1
+
+# Google Cloud 配置
+export GOOGLE_CLOUD_PROJECT="your-project-id"
+
+# 其他 API Keys
+# export OPENAI_API_KEY="your-openai-key"
+# export GITHUB_TOKEN="your-github-token"
+
+# 本地特定配置
+# export LOCAL_DEV_PORT=3000

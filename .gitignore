@@ -1,0 +1,19 @@
+# 敏感配置文件
+.zshrc.local
+*.local
+
+# Claude Code 配置
+CLAUDE.md
+
+# 编辑器备份
+*~
+*.swp
+*.swo
+.*.swp
+
+# macOS
+.DS_Store
+
+# IDE
+.idea/
+.vscode/
