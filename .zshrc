@@ -35,6 +35,13 @@ zinit wait lucid for \
   blockf atpull'zinit creinstall -q .' \
     zsh-users/zsh-completions
 
+# 历史子串搜索（输入部分命令后上下键切换匹配历史）
+zinit ice wait lucid atload"
+  bindkey '^[[A' history-substring-search-up
+  bindkey '^[[B' history-substring-search-down
+"
+zinit light zsh-users/zsh-history-substring-search
+
 # z 目录跳转
 zinit ice wait lucid
 zinit light agkozak/zsh-z
