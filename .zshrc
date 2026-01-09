@@ -6,6 +6,34 @@ if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]
 fi
 
 # =============================================
+# Zsh 性能优化配置
+# =============================================
+# 减少编译缓存大小，提升加载速度
+zstyle ':completion:*' use-cache on
+zstyle ':completion:*' cache-path "$XDG_CACHE_HOME/zsh/zcompcache"
+
+# 补全时不自动选择第一个选项（避免误操作）
+zstyle ':completion:*' menu select
+
+# 补全时不区分大小写
+zstyle ':completion:*' matcher-list 'm:{a-zA-Z}={A-Za-z}'
+
+# 增加历史记录大小
+HISTSIZE=100000
+SAVEHIST=100000
+setopt HIST_IGNORE_DUPS          # 不记录重复命令
+setopt HIST_IGNORE_SPACE         # 不记录以空格开头的命令
+setopt HIST_FIND_NO_DUPS         # 查找历史时不显示重复
+setopt SHARE_HISTORY             # 多个终端共享历史
+setopt EXTENDED_HISTORY          # 记录命令执行时间
+
+# 自动建议优化（减少延迟）
+ZSH_AUTOSUGGEST_STRATEGY=(history completion)
+ZSH_AUTOSUGGEST_USE_ASYNC=1
+ZSH_AUTOSUGGEST_MANUAL_REBIND=1
+ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE='fg=242'
+
+# =============================================
 # Zinit 插件管理器
 # =============================================
 ZINIT_HOME="${XDG_DATA_HOME:-${HOME}/.local/share}/zinit/zinit.git"
@@ -30,16 +58,14 @@ zinit light romkatv/powerlevel10k
 zinit wait lucid for \
   atinit"zicompinit; zicdreplay" \
     zdharma-continuum/fast-syntax-highlighting \
-  atload"_zsh_autosuggest_start" \
+  atload"_zsh_autosuggest_start; ZSH_AUTOSUGGEST_USE_ASYNC=1" \
     zsh-users/zsh-autosuggestions \
   blockf atpull'zinit creinstall -q .' \
     zsh-users/zsh-completions
 
 # 历史子串搜索（输入部分命令后上下键切换匹配历史）
-zinit ice wait lucid atload"
-  bindkey '^[[A' history-substring-search-up
-  bindkey '^[[B' history-substring-search-down
-"
+# 注意：此插件必须在 syntax-highlighting 和 autosuggestions 之后加载
+zinit ice wait lucid atload'bindkey "^[[A" history-substring-search-up; bindkey "^[[B" history-substring-search-down; bindkey "^P" history-substring-search-up; bindkey "^N" history-substring-search-down; bindkey -M vicmd "k" history-substring-search-up; bindkey -M vicmd "j" history-substring-search-down'
 zinit light zsh-users/zsh-history-substring-search
 
 # z 目录跳转
@@ -85,29 +111,35 @@ export GOPATH="$HOME/go"
 export GOBIN="$GOPATH/bin"
 export PATH="$PATH:$GOBIN"
 
-# Go Modules 配置
-go env -w GO111MODULE=on 2>/dev/null
-go env -w GOPROXY=https://goproxy.cn,direct 2>/dev/null
+# Go Modules 配置（仅在未设置时才执行，避免每次启动都调用 go env）
+if command -v go &>/dev/null && [[ "$(go env GOPROXY 2>/dev/null)" != *"goproxy.cn"* ]]; then
+  go env -w GO111MODULE=on GOPROXY=https://goproxy.cn,direct 2>/dev/null
+fi
 
 # =============================================
-# Node.js 开发环境 (NVM)
+# Node.js 开发环境 (NVM) - 延迟加载优化
 # =============================================
 export NVM_DIR="$HOME/.nvm"
-[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
-[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
 
-# 备用：系统级 NVM
-[ -s "/usr/share/nvm/init-nvm.sh" ] && \. "/usr/share/nvm/init-nvm.sh"
+# 延迟加载 NVM（首次调用 node/npm/npx/nvm 时才加载）
+_load_nvm() {
+  unset -f node npm npx nvm 2>/dev/null
+  [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+  [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
+  [ -s "/usr/share/nvm/init-nvm.sh" ] && \. "/usr/share/nvm/init-nvm.sh"
+}
+
+# 创建占位函数
+for cmd in node npm npx nvm; do
+  eval "$cmd() { _load_nvm; $cmd \"\$@\"; }"
+done
+unset cmd
 
 # =============================================
 # Python 开发环境 (uv)
 # =============================================
 export UV_HOME="$HOME/.local/bin"
 # uv 自动管理 Python 版本，无需额外配置
-# 启用 uv 的 shell 补全
-if command -v uv &> /dev/null; then
-  eval "$(uv generate-shell-completion zsh)"
-fi
 
 # =============================================
 # 常用别名
@@ -183,3 +215,13 @@ typeset -U PATH
 # 加载本地私有配置（敏感信息）
 # =============================================
 [[ -f ~/.zshrc.local ]] && source ~/.zshrc.local
+
+# =============================================
+# 补全系统初始化（必须放在最后）
+# =============================================
+# 初始化 compinit 并重放被延迟的 compdef 调用
+autoload -Uz compinit && compinit -C
+(( ${+_comps} )) && zinit cdreplay -q 2>/dev/null
+
+# uv 补全（需要在 compinit 之后）
+command -v uv &>/dev/null && eval "$(uv generate-shell-completion zsh 2>/dev/null)"
