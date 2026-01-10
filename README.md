@@ -109,7 +109,7 @@ curl -LsSf https://astral.sh/uv/install.sh | sh
 |------|------|
 | `mkcd dir` | 创建目录并进入 |
 | `ff pattern` | 查找文件 |
-| `fd pattern` | 查找目录 |
+| `fdir pattern` | 查找目录 |
 | `gacp "msg"` | git add + commit + push |
 | `port 8080` | 查看端口占用 |
 
