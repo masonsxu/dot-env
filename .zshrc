@@ -40,6 +40,11 @@ ZSH_AUTOSUGGEST_STRATEGY=(history)
 ZSH_AUTOSUGGEST_USE_ASYNC=1
 ZSH_AUTOSUGGEST_MANUAL_REBIND=1
 ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE='fg=242'
+# 在使用 history-substring-search 时清除 autosuggestions，避免叠加显示
+ZSH_AUTOSUGGEST_CLEAR_WIDGETS+=(
+  history-substring-search-up
+  history-substring-search-down
+)
 
 # ============================================================
 # Zinit 插件管理器
@@ -70,16 +75,14 @@ zinit wait lucid for \
   blockf atpull'zinit creinstall -q .' \
     zsh-users/zsh-completions
 
-# 历史子串搜索（wait'1' 确保在 autosuggest 之后加载）
-zinit ice wait'1' lucid atload'
-  bindkey "^[[A" history-substring-search-up
-  bindkey "^[[B" history-substring-search-down
-  bindkey "^P" history-substring-search-up
-  bindkey "^N" history-substring-search-down
-  bindkey -M vicmd "k" history-substring-search-up
-  bindkey -M vicmd "j" history-substring-search-down
-'
+# 历史子串搜索（同步加载，确保键绑定生效）
 zinit light zsh-users/zsh-history-substring-search
+bindkey "^[[A" history-substring-search-up
+bindkey "^[[B" history-substring-search-down
+bindkey "^P" history-substring-search-up
+bindkey "^N" history-substring-search-down
+bindkey -M vicmd "k" history-substring-search-up
+bindkey -M vicmd "j" history-substring-search-down
 
 # z 目录跳转
 zinit ice wait lucid
