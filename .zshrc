@@ -44,6 +44,7 @@ ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE='fg=242'
 ZSH_AUTOSUGGEST_CLEAR_WIDGETS+=(
   history-substring-search-up
   history-substring-search-down
+  accept-line       # 按回车时清除建议，避免终端回显显示建议内容
 )
 
 # ============================================================
