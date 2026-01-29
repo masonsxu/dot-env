@@ -128,19 +128,22 @@ export GOPROXY=https://goproxy.cn,direct
 export PATH="$PATH:$GOBIN"
 
 # ============================================================
-# Node.js (NVM) 延迟加载
+# Node.js (NVM) 直接加载
 # ============================================================
 export NVM_DIR="$HOME/.nvm"
 
-_load_nvm() {
-  unfunction node npm npx nvm 2>/dev/null
-  [[ -s "$NVM_DIR/nvm.sh" ]] && source "$NVM_DIR/nvm.sh"
-}
-
-for cmd in node npm npx nvm; do
-  eval "$cmd() { _load_nvm; $cmd \"\$@\"; }"
-done
-unset cmd
+# 检查 nvm 是否安装
+if [[ ! -d "$NVM_DIR" ]]; then
+  echo "⚠️  NVM 未安装在 $NVM_DIR"
+  echo ""
+  echo "是否要自动安装 NVM？"
+  echo "  运行: install_nvm"
+else
+  # 直接加载 nvm
+  if [[ -s "$NVM_DIR/nvm.sh" ]]; then
+    source "$NVM_DIR/nvm.sh"
+  fi
+fi
 
 # ============================================================
 # Python (uv)
@@ -191,6 +194,27 @@ ff() { find . -type f -name "*$1*"; }
 fdir() { find . -type d -name "*$1*"; }
 gacp() { git add -A && git commit -m "$1" && git push; }
 port() { lsof -i :"$1"; }
+
+# NVM 安装函数
+install_nvm() {
+  if [[ -d "$HOME/.nvm" ]]; then
+    echo "✅ NVM 已经安装在 $HOME/.nvm"
+    echo "如需重新安装，请先删除该目录"
+    return 0
+  fi
+
+  echo "正在安装 NVM..."
+  curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.3/install.sh | bash
+
+  if [[ $? -eq 0 ]]; then
+    echo "✅ NVM 安装成功！"
+    echo "请运行以下命令使配置生效："
+    echo "  source ~/.zshrc"
+  else
+    echo "❌ NVM 安装失败"
+    return 1
+  fi
+}
 
 # ============================================================
 # PATH 整理
