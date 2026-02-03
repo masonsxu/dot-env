@@ -10,6 +10,9 @@ export CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC=1
 # Google Cloud 配置
 export GOOGLE_CLOUD_PROJECT="your-project-id"
 
+# OpenCode 配置
+export PATH="$HOME/.opencode/bin:$PATH"
+
 # 其他 API Keys
 # export OPENAI_API_KEY="your-openai-key"
 # export GITHUB_TOKEN="your-github-token"
